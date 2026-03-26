@@ -85,7 +85,12 @@ def task_tool(
     if runtime is not None:
         sandbox_state = runtime.state.get("sandbox")
         thread_data = runtime.state.get("thread_data")
+        # 1. First try runtime.context (subagent path)
         thread_id = runtime.context.get("thread_id") if runtime.context else None
+        
+        # 2. Fall back to config.configurable (LangGraph Server path)
+        if not thread_id and "configurable" in runtime.config:
+            thread_id = runtime.config["configurable"].get("thread_id")
 
         # Try to get parent model from configurable
         metadata = runtime.config.get("metadata", {})
